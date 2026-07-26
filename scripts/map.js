@@ -47,6 +47,7 @@ let autoDetectedTimeZone;
 let map;
 let geoJsonLayer, tileLayer;
 let selectedZoneLayer;
+let hoveredZoneLayer;
 
 init();
 
@@ -102,12 +103,26 @@ function hoverOnZone(event) {
 
     hoveredTimeZoneEl.innerText = zoneLayer.feature.properties[GEOJSON_TZID];
 
+    // Reset any previously hovered zone whose mouseout may have been dropped:
+    // bringToFront/bringToBack reorder the SVG paths mid-hover and can swallow
+    // the matching mouseout, otherwise leaving that zone stuck in the hover style.
+    if (
+        hoveredZoneLayer &&
+        hoveredZoneLayer !== zoneLayer &&
+        hoveredZoneLayer !== selectedZoneLayer
+    ) {
+        geoJsonLayer.resetStyle(hoveredZoneLayer);
+        hoveredZoneLayer.bringToBack();
+    }
+    hoveredZoneLayer = undefined;
+
     if (zoneLayer == selectedZoneLayer) {
         return;
     }
 
     zoneLayer.setStyle(ZONE_STYLE_HOVER);
     zoneLayer.bringToFront();
+    hoveredZoneLayer = zoneLayer;
 }
 
 function hoverOffZone(event) {
@@ -118,6 +133,9 @@ function hoverOffZone(event) {
 
     geoJsonLayer.resetStyle(zoneLayer);
     zoneLayer.bringToBack();
+    if (hoveredZoneLayer === zoneLayer) {
+        hoveredZoneLayer = undefined;
+    }
 }
 
 function clickZone(event) {
