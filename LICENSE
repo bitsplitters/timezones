@@ -1,0 +1,41 @@
+THIRD-PARTY NOTICES AND LICENSES
+================================
+
+This repository redistributes a static "Time Zone Picker" web page that is built on
+top of several third-party open-source components and data sets. Each retains its own
+license. This project claims no ownership over those components; the notices below are
+provided to comply with their license terms.
+
+The original picker UI is based on an open-source Leaflet time-zone picker; credit to
+its authors.
+
+-------------------------------------------------------------------------------
+Leaflet (bundled: scripts/leaflet.js, styles/leaflet.css)
+Version 1.9.4 — https://leafletjs.com/
+License: BSD-2-Clause
+Copyright (c) 2010-2023, Volodymyr Agafonkin
+Copyright (c) 2010-2011, CloudMade
+
+-------------------------------------------------------------------------------
+Bootstrap (bundled: styles/bootstrap.min.css)
+Version 4.6.2 — https://getbootstrap.com/
+License: MIT
+Copyright (c) 2011-2022 The Bootstrap Authors
+
+-------------------------------------------------------------------------------
+Map tiles
+Source: OpenStreetMap — https://www.openstreetmap.org/copyright
+© OpenStreetMap contributors. Tile data is made available under the
+Open Database License (ODbL): https://opendatacommons.org/licenses/odbl/
+
+-------------------------------------------------------------------------------
+Time-zone boundary data (data/2023d-combined-simplified.json)
+Derived from OpenStreetMap via timezone-boundary-builder
+https://github.com/evansiroky/timezone-boundary-builder
+The boundary data is derived from OpenStreetMap and is therefore subject to the
+Open Database License (ODbL): https://opendatacommons.org/licenses/odbl/
+© OpenStreetMap contributors.
+
+-------------------------------------------------------------------------------
+Any original code in this repository (e.g. scripts/map.js glue, styles/custom.css,
+index.html) is provided "as is", without warranty of any kind.
