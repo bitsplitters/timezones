@@ -24,12 +24,12 @@ html, body {
   display: flex; flex-direction: column; min-height: 100vh;
 }
 .tz-head { margin-bottom: clamp(1.25rem, 3vw, 2rem); }
-.tz-head .mark {
+.tz-head .wordmark {
   font-family: var(--mono); font-weight: 700; letter-spacing: -.01em;
   font-size: .95rem; color: var(--text); text-decoration: none;
   display: inline-flex; align-items: baseline; gap: .12em; margin-bottom: 1.2rem;
 }
-.tz-head .mark .bar { width: 2px; align-self: stretch; background: var(--accent); margin: .15em .04em; border-radius: 1px; }
+.tz-head .wordmark .bar { width: 2px; align-self: stretch; background: var(--accent); margin: .15em .04em; border-radius: 1px; }
 .tz-head h1 {
   font-family: var(--sans); font-weight: 750;
   font-size: clamp(1.8rem, 4.5vw, 2.8rem); letter-spacing: -.02em;
