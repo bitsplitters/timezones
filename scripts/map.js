@@ -22,59 +22,47 @@ const ZONE_STYLE_DEFAULT = {
 const ZONE_STYLE_HOVER = {
     color: '#666666',
     weight: 5,
-    // opacity: 1,
     dashArray: '',
-    // fillColor: '#fd8d3c',
     fillOpacity: 0.3,
 };
 const ZONE_STYLE_SELECTED = {
-    // color: '#666666',
     weight: 5,
-    // opacity: 1,
     dashArray: '',
     fillColor: '#0000ff',
     fillOpacity: 0.3,
 };
 
 // Selectors
-let autoDetectedTimeZoneEl = document.getElementById('auto-detected-time-zone');
-let selectedTimeZoneEl = document.getElementById('selected-time-zone');
-let selectedTimeZoneCopyBtn = document.getElementById('selected-time-zone-copy-btn');
-let hoveredTimeZoneEl = document.getElementById('hovered-time-zone');
+let tzValueEl = document.getElementById('tz-value');
+let tzCopiedEl = document.getElementById('tz-copied');
 
 // Variables
 let autoDetectedTimeZone;
+let selectedTimeZone;
 let map;
 let geoJsonLayer, tileLayer;
 let selectedZoneLayer;
 let hoveredZoneLayer;
+let copiedTimer;
 
 init();
 
 async function init() {
-    // Auto-detect time zone
+    // Auto-detect time zone (shown as the starting value, not copied)
     autoDetectedTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (autoDetectedTimeZone) {
-        autoDetectedTimeZoneEl.innerText = autoDetectedTimeZone;
-        selectedTimeZoneEl.value = autoDetectedTimeZone;
+        selectedTimeZone = autoDetectedTimeZone;
+        tzValueEl.innerText = autoDetectedTimeZone;
     }
-
-    // Set up copy button click event
-    selectedTimeZoneCopyBtn.onclick = async () => {
-        selectedTimeZoneEl.select();
-        await navigator.clipboard.writeText(selectedTimeZoneEl.value);
-    };
 
     map = L.map(MAP_ID).setView(MAP_DEFAULT_LATLONG, MAP_DEFAULT_ZOOM);
 
-    // Create map tile layer
     tileLayer = L.tileLayer(TILES_URL, {
         minZoom: MAP_MIN_ZOOM,
         maxZoom: MAP_MAX_ZOOM,
         attribution: TILES_ATTRIBUTION,
     }).addTo(map);
 
-    // Create GeoJson layer
     let response = await fetch(GEOJSON_PATH);
     let json = await response.json();
     geoJsonLayer = L.geoJson(json, {
@@ -84,15 +72,15 @@ async function init() {
 }
 
 function initFeature(_feature, zoneLayer) {
-    // Set up zone layer events
     zoneLayer.on({
         mouseover: hoverOnZone,
         mouseout: hoverOffZone,
         click: clickZone,
     });
 
+    // Pre-select the auto-detected zone (highlight only, no copy)
     if (zoneLayer.feature.properties[GEOJSON_TZID] == autoDetectedTimeZone) {
-        clickZoneLayer(zoneLayer);
+        selectZoneLayer(zoneLayer);
     } else {
         zoneLayer.bringToBack();
     }
@@ -101,7 +89,8 @@ function initFeature(_feature, zoneLayer) {
 function hoverOnZone(event) {
     let zoneLayer = event.target;
 
-    hoveredTimeZoneEl.innerText = zoneLayer.feature.properties[GEOJSON_TZID];
+    // Preview the hovered zone in the label
+    tzValueEl.innerText = zoneLayer.feature.properties[GEOJSON_TZID];
 
     // Reset any previously hovered zone whose mouseout may have been dropped:
     // bringToFront/bringToBack reorder the SVG paths mid-hover and can swallow
@@ -127,6 +116,12 @@ function hoverOnZone(event) {
 
 function hoverOffZone(event) {
     let zoneLayer = event.target;
+
+    // Restore the label to the current selection when the pointer leaves a zone
+    if (selectedTimeZone) {
+        tzValueEl.innerText = selectedTimeZone;
+    }
+
     if (zoneLayer == selectedZoneLayer) {
         return;
     }
@@ -140,11 +135,12 @@ function hoverOffZone(event) {
 
 function clickZone(event) {
     let zoneLayer = event.target;
-    clickZoneLayer(zoneLayer);
+    selectZoneLayer(zoneLayer);
+    // Real user gesture: copy automatically and confirm
+    copyZone(selectedTimeZone);
 }
 
-function clickZoneLayer(zoneLayer) {
-    // Reset the old selected layer
+function selectZoneLayer(zoneLayer) {
     if (selectedZoneLayer && selectedZoneLayer != zoneLayer) {
         geoJsonLayer.resetStyle(selectedZoneLayer);
         selectedZoneLayer.bringToBack();
@@ -153,6 +149,25 @@ function clickZoneLayer(zoneLayer) {
     zoneLayer.setStyle(ZONE_STYLE_SELECTED);
     zoneLayer.bringToFront();
     selectedZoneLayer = zoneLayer;
-    selectedTimeZoneEl.value = zoneLayer.feature.properties[GEOJSON_TZID];
+    selectedTimeZone = zoneLayer.feature.properties[GEOJSON_TZID];
+    tzValueEl.innerText = selectedTimeZone;
     map.fitBounds(zoneLayer.getBounds());
+}
+
+async function copyZone(tz) {
+    if (!tz) {
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(tz);
+        showCopied();
+    } catch (e) {
+        // Clipboard blocked (rare): the zone is still selected, just no auto-copy.
+    }
+}
+
+function showCopied() {
+    tzCopiedEl.classList.add('show');
+    clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(() => tzCopiedEl.classList.remove('show'), 1600);
 }

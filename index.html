@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Time Zone Picker — bitsplitters</title>
-    <meta name="description" content="Find your IANA time zone: click your region on the map, then copy its official name with one click." />
+    <meta name="description" content="Find your IANA time zone: click your region on the map and it's copied automatically." />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
@@ -19,31 +19,19 @@
         <header class="tz-head">
             <a class="mark" href="https://bitsplitters.app">bit<span class="bar"></span>splitters</a>
             <h1>Find and copy your time zone</h1>
-            <p class="sub">Click your region on the map to get its official IANA time zone name, then copy it with one click.</p>
+            <p class="sub">Click your region on the map and its official IANA time zone name is copied for you — ready to paste into Team Tasks Manager.</p>
         </header>
 
         <main class="tz-grid">
             <div id="map"></div>
 
             <aside class="tz-panel">
-                <div class="field">
-                    <span class="flabel">Auto-detected</span>
-                    <span id="auto-detected-time-zone" class="fval">Unknown</span>
+                <span class="flabel">Your time zone</span>
+                <div class="tz-current">
+                    <span id="tz-value" class="tz-value">—</span>
+                    <span id="tz-copied" class="tz-copied">copied</span>
                 </div>
-
-                <div class="field primary">
-                    <span class="flabel">Your time zone</span>
-                    <div class="copy-row">
-                        <input readonly id="selected-time-zone" class="tz-input" type="text" value="None" />
-                        <button id="selected-time-zone-copy-btn" class="tz-copy" type="button">Copy</button>
-                    </div>
-                    <span class="fhint">Pick your area on the map, then copy.</span>
-                </div>
-
-                <div class="field">
-                    <span class="flabel">Hovering</span>
-                    <span id="hovered-time-zone" class="fval muted">None</span>
-                </div>
+                <p class="fhint">Hover to preview a region, click it to copy automatically.</p>
             </aside>
         </main>
 
